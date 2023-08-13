@@ -1,3 +1,7 @@
+# CANCELED:
+SDK DOES NOT SUPPORT EASY WAY TO ALTER PLAYBACK RATE
+I tried using the seek() and a combination of resume() and pause(), but since they are asynchronous calls, I don't think they'll work well for this use case. 
+
 # Web Playback SDK Javascript Tutorial
 
 This repository contains the source code for the [Web Playback SDK Guide](https://developer.spotify.com/documentation/web-playback-sdk/guide/).
