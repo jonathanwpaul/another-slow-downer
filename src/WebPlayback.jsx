@@ -18,6 +18,8 @@ function WebPlayback(props) {
     const [is_active, setActive] = useState(false);
     const [player, setPlayer] = useState(undefined);
     const [current_track, setTrack] = useState(track);
+    const [timestamp, setTimestamp] = useState(0);
+    const [speedshifted, setSpeedshifted] = useState(false);
 
     useEffect(() => {
 
@@ -53,7 +55,6 @@ function WebPlayback(props) {
 
                 setTrack(state.track_window.current_track);
                 setPaused(state.paused);
-
                 player.getCurrentState().then( state => { 
                     (!state)? setActive(false) : setActive(true) 
                 });
@@ -75,6 +76,15 @@ function WebPlayback(props) {
                 </div>
             </>)
     } else {
+        player.getCurrentState().then(state => 
+        {
+            setTimestamp(state.position)
+        })
+        let time = timestamp
+        let minutes = Math.floor(time/1000/60)
+        time = time - minutes * 60000
+        let seconds = Math.floor(time/1000)
+        let millis = time % seconds
         return (
             <>
                 <div className="container">
@@ -83,7 +93,10 @@ function WebPlayback(props) {
                         <img src={current_track.album.images[0].url} className="now-playing__cover" alt="" />
 
                         <div className="now-playing__side">
-                            <div className="now-playing__name">{current_track.name}</div>
+                            <div className="now-playing__name">{
+                            `${current_track.name} ${minutes}:${seconds}:${millis}`
+                            
+                            }</div>
                             <div className="now-playing__artist">{current_track.artists[0].name}</div>
 
                             <button className="btn-spotify" onClick={() => { player.previousTrack() }} >
@@ -96,6 +109,24 @@ function WebPlayback(props) {
 
                             <button className="btn-spotify" onClick={() => { player.nextTrack() }} >
                                 &gt;&gt;
+                            </button>
+
+                            <button className="btn-spotify" onClick={() => { 
+                                    setSpeedshifted(!speedshifted)
+                                    if(speedshifted) {
+                                        clearInterval(timeSeeker)
+                                    }
+                                    
+                                    timeSeeker = setInterval(() => {
+                                        player.getCurrentState().then(state => {
+                                            setTimestamp(state.position)
+                                            player.seek(timestamp + 500)
+                                        })
+                                    }, 1000)
+
+                                }
+                            }>
+                                0.5x
                             </button>
                         </div>
                     </div>
